@@ -216,7 +216,7 @@ void Test(int a) {
 
 int main()
 {
-	int command = 1;
+	int command = 2;
 	do {
 		cout << endl << "Enter function number:" << endl << "1. QuickSort" << endl << "2. BubbleSort" << endl << "3. SelectionSort" << endl << "4. InsertionSort" << endl << "5. CountingSort" << endl << "6. MergeSort" << endl << "7. Leave program" << endl << "8. Start writing" << endl << "9. Finish Writing" << endl << "10. Output data" << endl << "11. Remove data" << endl;
 		int a;
