@@ -12,17 +12,89 @@ const int M = 10000000;
 bool filewriting = false;
 FILE* fLog;
 
-int Partition(int a[], int first, int last) {
-	int pivot = a[(first + last) / 2];
+//ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+
+void Heapify(int* ar, int n, int i) {
+	int largest = i;
+	int l = 2 * i + 1;
+	int r = 2 * i + 2;
+
+	if (l < n && ar[l] > ar[largest])
+		largest = l;
+
+	if (r < n && ar[r] > ar[largest])
+		largest = r;
+
+	if (largest != i) {
+		swap(ar[i], ar[largest]);
+		Heapify(ar, n, largest);
+	}
+}
+
+void Merge(int* ar, int l, int m, int r) {
+	int len1 = m - l + 1, len2 = r - m;
+	int* left = new int[len1];
+	int* right = new int[len2];
+	for (int i = 0; i < len1; i++)
+		left[i] = ar[l + i];
+	for (int i = 0; i < len2; i++)
+		right[i] = ar[m + 1 + i];
+
+	int i = 0;
+	int j = 0;
+	int k = l;
+
+	while (i < len1 && j < len2) {
+		if (left[i] <= right[j]) {
+			ar[k] = left[i];
+			i++;
+		}
+		else {
+			ar[k] = right[j];
+			j++;
+		}
+		k++;
+	}
+
+	while (i < len1) {
+		ar[k] = left[i];
+		k++;
+		i++;
+	}
+
+	while (j < len2) {
+		ar[k] = right[j];
+		k++;
+		j++;
+	}
+	delete[] left;
+	delete[] right;
+}
+
+int ModifiedPartition(int* ar, int low, int high) {
+	int pivot = ar[high];
+	int pIndex = low;
+	for (int i = low; i < high; i++) {
+		if (ar[i] <= pivot) {
+			swap(ar[i], ar[pIndex]);
+			pIndex++;
+		}
+	}
+	swap(ar[pIndex], ar[high]);
+	return pIndex;
+}
+
+int Partition(int* ar, int first, int last) {
+	int pivot = ar[(first + last) / 2];
 	int i = first, j = last;
 	while (true) {
-		while (a[i] < pivot)
+		while (ar[i] < pivot)
 			i++;
-		while (a[j] > pivot)
+		while (ar[j] > pivot)
 			j--;
 		if (i >= j)
 			break;
-		swap(a[i], a[j]);
+		swap(ar[i], ar[j]);
 		i++;
 		j--;
 	}
@@ -40,11 +112,32 @@ int GetMax(int* ar, int size) {
 	return max;
 }
 
-void InsertionSort(int ar[], int len) {
-	for (int i = 1; i < len; i++)
-		for (int j = i; j > 0; j--)
-			if (ar[j] < ar[j - 1])
-				swap(ar[j], ar[j - 1]);
+//ФУНКЦИИ СОРТИРОВОК
+
+void InsertionSort(int* ar, int left, int right) {
+	for (int i = left + 1; i <= right; i++) {
+		int temp = ar[i];
+		int j = i - 1;
+		while (j >= left && ar[j] > temp) {
+			ar[j + 1] = ar[j];
+			j--;
+		}
+		ar[j + 1] = temp;
+	}
+}
+
+void TimSort(int* ar, int len)
+{
+	for (int i = 0; i < len; i += 32)
+		InsertionSort(ar, i, min((i + 32 - 1), (len - 1)));
+	for (int size = 32; size < len; size = 2 * size) {
+		for (int left = 0; left < len; left += 2 * size) {
+			int mid = left + size - 1;
+			int right = min((left + 2 * size - 1), (len - 1));
+			if (mid < right)
+				Merge(ar, left, mid, right);
+		}
+	}
 }
 
 void BubbleSort(int* ar, int len) {
@@ -52,6 +145,26 @@ void BubbleSort(int* ar, int len) {
 		for (int i = 0; i < k; i++) {
 			if (ar[i] > ar[i + 1]) {
 				swap(ar[i], ar[i + 1]);
+			}
+		}
+	}
+}
+
+void ModifiedQuicksort(int* ar, int low, int high) {
+	while (low < high) {
+		if (high - low < 10) {
+			InsertionSort(ar, low, high);
+			break;
+		}
+		else {
+			int pivot = ModifiedPartition(ar, low, high);
+			if (pivot - low < high - pivot) {
+				ModifiedQuicksort(ar, low, pivot - 1);
+				low = pivot + 1;
+			}
+			else {
+				ModifiedQuicksort(ar, pivot + 1, high);
+				high = pivot - 1;
 			}
 		}
 	}
@@ -96,35 +209,6 @@ void CountingSort(int* ar, int len) {
 	delete[] counter;
 }
 
-void Merging(int* ar, int begin, int end) {
-	int i = begin, t = 0, mid = begin + (end - begin) / 2, j = mid + 1;
-	int* d = new int[M];
-	while (i <= mid && j <= end) {
-		if (ar[i] <= ar[j]) {
-			d[t] = ar[i]; 
-			i++;
-		}
-		else {
-			d[t] = ar[j]; 
-			j++;
-		}
-		t++;
-	}
-	while (i <= mid) {
-		d[t] = ar[i]; 
-		i++; 
-		t++;
-	}
-	while (j <= end) {
-		d[t] = ar[j]; 
-		j++; 
-		t++;
-	}
-	for (i = 0; i < t; i++)
-		ar[begin + i] = d[i];
-	delete[] d;
-}
-
 void MergeSort(int* ar, int right, int left) {
 	if (left < right)
 		if (right - left == 1) {
@@ -135,9 +219,41 @@ void MergeSort(int* ar, int right, int left) {
 		else {
 			MergeSort(ar, left + (right - left) / 2, left);
 			MergeSort(ar, right, left + (right - left) / 2 + 1);
-			Merging(ar, left, right);
+			Merge(ar, left, left + (right - left) / 2, right);
 		}
 }
+
+void ShellSort(int* ar, int len) {
+	for (int d = len / 2; d > 0; d /= 2)
+		for (int i = d; i < len; i += d)
+			for (int j = i; j > 0; j -= d)
+				if (ar[j] < ar[j - d])
+					swap(ar[j], ar[j - d]);
+}
+
+void GnomeSort(int* ar, int len) {	
+	for (int i = 0; i < len;) {
+		if (i == 0)
+			i++;
+		if (ar[i] >= ar[i - 1])
+			i++;
+		else {
+			swap(ar[i], ar[i - 1]);
+			i--;
+		}
+	}
+}
+
+void HeapSort(int* ar, int len) {
+	for (int i = len / 2 - 1; i >= 0; i--)
+		Heapify(ar, len, i);
+	for (int i = len - 1; i >= 0; i--) {
+		swap(ar[0], ar[i]);
+		Heapify(ar, i, 0);
+	}
+}
+
+//ПРОЧИЕ ФУНКЦИИ
 
 int GetRandomNumber(int min, int max) {
 	int num = min + rand() % (max - min + 1);
@@ -159,46 +275,12 @@ void OutputData(FILE* &fLog) {
 	fclose(fLog);
 }
 
-void Test(int a) {
-	srand(static_cast<unsigned int>(time(NULL)));
-	cout << "Enter length: " << endl;
-	int len;
-	cin >> len;
-	int* ar = new int[M];
+void MashUp(int* ar, int len) {
 	for (int i = 0; i < len; i++)
 		ar[i] = GetRandomNumber(-1000, 1000);
+}
 
-	auto begin = std::chrono::steady_clock::now();
-
-	switch (a) {
-	case 1:
-		QuickSort(ar, len - 1, 0);
-		break;
-	case 2:
-		BubbleSort(ar, len);
-		break;
-	case 3:
-		SelectionSort(ar, len);
-		break;
-	case 4:
-		InsertionSort(ar, len);
-		break;
-	case 5:
-		CountingSort(ar, len);
-		break;
-	case 6:
-		MergeSort(ar, len - 1, 0);
-		break;
-	}
-
-	auto end = std::chrono::steady_clock::now();
-	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
-	int Time = elapsed_ms.count();
-	cout << "Time = " << Time << " milliseconds" << endl;
-	
-	if (filewriting)
-		FileWrite(Time, len);
-
+void Check(int* ar, int len) {
 	bool ok = true;
 	for (int i = 0; i < len - 1; i++)
 		if (ar[i] > ar[i + 1])
@@ -207,54 +289,60 @@ void Test(int a) {
 		cout << "SORTED CORRECTLY!" << endl;
 	else
 		cout << "SORT FAILED" << endl;
+}
 
-	for (int i = 0; i < len; i++)
-		cout << ar[i] << ' ';
+void Test() {
+	srand(static_cast<unsigned int>(time(NULL)));
+	cout << "Enter length: " << endl;
+	int len;
+	cin >> len;
+	int* ar = new int[M];
+	auto begin = std::chrono::steady_clock::now();
+	MashUp(ar, len);
+	QuickSort(ar, len - 1, 0);
+	Check(ar, len);
+	MashUp(ar, len);
+	BubbleSort(ar, len);
+	Check(ar, len);
+	MashUp(ar, len);
+	SelectionSort(ar, len);
+	Check(ar, len);
+	MashUp(ar, len);
+	InsertionSort(ar, 0, len);
+	Check(ar, len);
+	MashUp(ar, len);
+	CountingSort(ar, len);
+	Check(ar, len);
+	MashUp(ar, len);
+	MergeSort(ar, len - 1, 0);
+	Check(ar, len);
+	MashUp(ar, len);
+	ShellSort(ar, len);
+	Check(ar, len);
+	MashUp(ar, len);
+	GnomeSort(ar, len);
+	Check(ar, len);
+	MashUp(ar, len);
+	TimSort(ar, len + 1);
+	Check(ar, len);
+	MashUp(ar, len);
+	ModifiedQuicksort(ar, 0, len - 1);
+	Check(ar, len);
+	MashUp(ar, len);
+	HeapSort(ar, len);
+	Check(ar, len);
+	auto end = std::chrono::steady_clock::now();
+	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
+	int Time = elapsed_ms.count();
+	cout << "Time = " << Time << " milliseconds" << endl;
+	
+	FileWrite(Time, len);
 
 	delete[] ar;
 }
 
 int main()
 {
-	int command = 2;
-	do {
-		cout << endl << "Enter function number:" << endl << "1. QuickSort" << endl << "2. BubbleSort" << endl << "3. SelectionSort" << endl << "4. InsertionSort" << endl << "5. CountingSort" << endl << "6. MergeSort" << endl << "7. Leave program" << endl << "8. Start writing" << endl << "9. Finish Writing" << endl << "10. Output data" << endl << "11. Remove data" << endl;
-		int a;
-		cin >> a;
-		switch (a) {
-		case 1:
-			Test(1);
-			break;
-		case 2:
-			Test(2);
-			break;
-		case 3:
-			Test(3);
-			break;
-		case 4:
-			Test(4);
-			break;
-		case 5:
-			Test(5);
-			break;
-		case 6:
-			Test(6);
-			break;
-		case 7:
-			command = 10;
-			break;
-		case 8:
-			filewriting = true;
-			break;
-		case 9:
-			filewriting = false;
-			break;
-		case 10:
-			OutputData(fLog);
-			break;
-		case 11:
-			remove("C:\\Users\\Zhon1\\Desktop\\ОБУЧЕНИЕ\\Инфа\\2 семестр\\ОП\\ДЗ1\\DZ1\\test1");
-		}
-	} while (command != 10);
+	Test();
     return 0;
 }
