@@ -1,17 +1,9 @@
 #include "funcs.h"
-#define _CRT_SECURE_NO_WARNINGS
-#include <iostream>
-#include <cmath>
-#include <time.h>
-#include <chrono>
-#include <fstream>
-#include <stdio.h>
-
 using namespace std;
 
-const int M = 10000000;
 bool filewriting = false;
-FILE* fLog;
+FILE* fLog = fopen("test1", "a");
+string res[12][121];
 
 //¬—œŒÃŒ√¿“≈À‹Õ€≈ ‘”Õ ÷»»
 
@@ -261,10 +253,9 @@ int GetRandomNumber(int min, int max) {
 	return num;
 }
 
-void FileWrite(int Time, int len) {
-	fLog = fopen("test1", "a");
-	fprintf(fLog, "%d\t%d\n", Time, len);
-	fclose(fLog);
+void ResAdd(int Time, int len, int x, int y) {
+	res[0][x] = len;
+	res[y + 2][x] = Time;
 }
 
 void OutputData(FILE*& fLog) {
@@ -292,54 +283,112 @@ void Check(int* ar, int len) {
 		cout << "SORT FAILED" << endl;
 }
 
+void Sort(int index, int* ar, int len) {
+	switch (index) {
+	case 0:
+		InsertionSort(ar, 0, len);
+		break;
+	case 1:
+		TimSort(ar, len + 1);
+		break;
+	case 2:
+		BubbleSort(ar, len);
+		break;
+	case 3:
+		ModifiedQuicksort(ar, 0, len - 1);
+		break;
+	case 4:
+		QuickSort(ar, len - 1, 0);
+		break;
+	case 5:
+		SelectionSort(ar, len);
+		break;
+	case 6:
+		CountingSort(ar, len);
+		break;
+	case 7:
+		MergeSort(ar, len - 1, 0);
+		break;
+	case 8:
+		ShellSort(ar, len);
+		break;
+	case 9:
+		GnomeSort(ar, len);
+		break;
+	case 10:
+		HeapSort(ar, len);
+		break;
+	}
+}
+
+void ResMake() {
+	for (int i = 0; i < 12; i++)
+		for (int j = 0; j < 121; j++) {
+			res[i][j] = '\0';
+		}
+	res[1][0] = "Inser";
+	res[2][0] = "Tim";
+	res[3][0] = "Bubbl";
+	res[4][0] = "ModQ";
+	res[5][0] = "Quick";
+	res[6][0] = "Selec";
+	res[7][0] = "Count";
+	res[8][0] = "Merge";
+	res[9][0] = "Shell";
+	res[10][0] = "Gnome";
+	res[11][0] = "Heap";
+}
+
+void ResToFile() {
+	for (int i = 0; i < 12; i++) {
+		for (int j = 0; j < 121; j++) {
+			fprintf(fLog, "%5s", res[i][j].c_str());
+		}
+		fprintf(fLog, "\n");
+	}
+}
+
 void Test() {
+	ResMake();
 	srand(static_cast<unsigned int>(time(NULL)));
-	cout << "Enter length: " << endl;
-	int len;
-	cin >> len;
-	int* ar = new int[M];
-	auto begin = std::chrono::steady_clock::now();
-	/*MashUp(ar, len);
-	QuickSort(ar, len - 1, 0);
-	Check(ar, len);*/
+	int* ar = new int[10000000];
+	int* funcOut = new int[11];
+	for (int i = 0; i < 11; i++) {
+		funcOut[i] = 0;
+	}
+	for (int len = 100, step = 100, count = 1;; len += step, count++) {
+		if (len == 1000) step = 250;
+		if (len == 5000) step = 500;
+		if (len == 10000) step = 1000;
+		if (len == 40000) step = 10000;
+		if (len == 20000) step = 50000;
+		if (len == 500000) step = 100000;
+		if (len == 3000000) step = 1000000;
+		if (len > 10000000) break;
 
-	MashUp(ar, len);
-	BubbleSort(ar, len);
-	Check(ar, len);
-
-	/*MashUp(ar, len);
-	SelectionSort(ar, len);
-	Check(ar, len);
-	MashUp(ar, len);
-	InsertionSort(ar, 0, len);
-	Check(ar, len);
-	MashUp(ar, len);
-	CountingSort(ar, len);
-	Check(ar, len);
-	MashUp(ar, len);
-	MergeSort(ar, len - 1, 0);
-	Check(ar, len);
-	MashUp(ar, len);
-	ShellSort(ar, len);
-	Check(ar, len);
-	MashUp(ar, len);
-	GnomeSort(ar, len);
-	Check(ar, len);
-	MashUp(ar, len);
-	TimSort(ar, len + 1);
-	Check(ar, len);
-	MashUp(ar, len);
-	ModifiedQuicksort(ar, 0, len - 1);
-	Check(ar, len);
-	MashUp(ar, len);
-	HeapSort(ar, len);
-	Check(ar, len);*/
-	auto end = std::chrono::steady_clock::now();
-	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
-	int Time = elapsed_ms.count();
-	cout << "Time = " << Time << " milliseconds" << endl;
-
-	FileWrite(Time, len);
-
+		for (int i = 0; i < 11; i++) {
+			for (int j = 0; funcOut[i] == 0 && j < 6; j++) {
+				int times[6];
+				MashUp(ar, len);
+				auto begin = std::chrono::steady_clock::now();
+				Sort(i, ar, len);
+				auto end = std::chrono::steady_clock::now();
+				//Check(ar, len);
+				auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
+				int Time = elapsed_ms.count();
+				if (Time > 200) {
+					funcOut[i] = 1;
+					break;
+				}
+				times[j] = Time;
+				if (j == 5) {
+					BubbleSort(times, 6);
+					Time = (times[2] + times[3]) / 2;
+					ResAdd(Time, len, count, i);
+				}
+			}
+		}
+	}
 	delete[] ar;
+	fclose(fLog);
 }
