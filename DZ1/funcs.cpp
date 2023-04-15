@@ -389,6 +389,7 @@ void Test() {
 			}
 		}
 	}
+	ResToFile();
 	delete[] ar;
 	fclose(fLog);
 }
