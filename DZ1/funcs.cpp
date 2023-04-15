@@ -1,4 +1,5 @@
-Ôªø#define _CRT_SECURE_NO_WARNINGS
+#include "funcs.h"
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <cmath>
 #include <time.h>
@@ -12,7 +13,7 @@ const int M = 10000000;
 bool filewriting = false;
 FILE* fLog;
 
-//–í–°–ü–û–ú–û–ì–ê–¢–ï–õ–¨–ù–´–ï –§–£–ù–ö–¶–ò–ò
+//¬—œŒÃŒ√¿“≈À‹Õ€≈ ‘”Õ ÷»»
 
 void Heapify(int* ar, int n, int i) {
 	int largest = i;
@@ -112,7 +113,7 @@ int GetMax(int* ar, int size) {
 	return max;
 }
 
-//–§–£–ù–ö–¶–ò–ò –°–û–†–¢–ò–†–û–í–û–ö
+//‘”Õ ÷»» —Œ–“»–Œ¬Œ 
 
 void InsertionSort(int* ar, int left, int right) {
 	for (int i = left + 1; i <= right; i++) {
@@ -190,7 +191,7 @@ void CountingSort(int* ar, int len) {
 	int i, max = -1;
 	int* counter;
 	for (i = 0; i < len; i++)
-		if (abs(ar[i]) > max) 
+		if (abs(ar[i]) > max)
 			max = abs(ar[i]);
 	counter = new int[max * 2 + 1];
 	for (i = 0; i < max * 2 + 1; i++)
@@ -231,7 +232,7 @@ void ShellSort(int* ar, int len) {
 					swap(ar[j], ar[j - d]);
 }
 
-void GnomeSort(int* ar, int len) {	
+void GnomeSort(int* ar, int len) {
 	for (int i = 0; i < len;) {
 		if (i == 0)
 			i++;
@@ -253,7 +254,7 @@ void HeapSort(int* ar, int len) {
 	}
 }
 
-//–ü–†–û–ß–ò–ï –§–£–ù–ö–¶–ò–ò
+//œ–Œ◊»≈ ‘”Õ ÷»»
 
 int GetRandomNumber(int min, int max) {
 	int num = min + rand() % (max - min + 1);
@@ -266,7 +267,7 @@ void FileWrite(int Time, int len) {
 	fclose(fLog);
 }
 
-void OutputData(FILE* &fLog) {
+void OutputData(FILE*& fLog) {
 	fLog = fopen("test1", "r");
 	int Time;
 	int len;
@@ -298,13 +299,15 @@ void Test() {
 	cin >> len;
 	int* ar = new int[M];
 	auto begin = std::chrono::steady_clock::now();
-	MashUp(ar, len);
+	/*MashUp(ar, len);
 	QuickSort(ar, len - 1, 0);
-	Check(ar, len);
+	Check(ar, len);*/
+
 	MashUp(ar, len);
 	BubbleSort(ar, len);
 	Check(ar, len);
-	MashUp(ar, len);
+
+	/*MashUp(ar, len);
 	SelectionSort(ar, len);
 	Check(ar, len);
 	MashUp(ar, len);
@@ -330,19 +333,13 @@ void Test() {
 	Check(ar, len);
 	MashUp(ar, len);
 	HeapSort(ar, len);
-	Check(ar, len);
+	Check(ar, len);*/
 	auto end = std::chrono::steady_clock::now();
 	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
 	int Time = elapsed_ms.count();
 	cout << "Time = " << Time << " milliseconds" << endl;
-	
+
 	FileWrite(Time, len);
 
 	delete[] ar;
-}
-
-int main()
-{
-	Test();
-    return 0;
 }
