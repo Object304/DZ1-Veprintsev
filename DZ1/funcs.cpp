@@ -259,7 +259,7 @@ void MashUp(int* ar, int len) {
 void Sort(int index, int* ar, int len) {
 	switch (index) {
 	case 0:
-		InsertionSort(ar, 0, len);
+		InsertionSort(ar, 0, len - 1);
 		break;
 	case 1:
 		TimSort(ar, len + 1);
@@ -340,7 +340,7 @@ void Test() {
 				//Check(ar, len);
 				auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
 				int Time = elapsed_ms.count();
-				if (Time > 100) {
+				if (Time > 2000) {
 					funcOut[i] = 1;
 					break;
 				}
