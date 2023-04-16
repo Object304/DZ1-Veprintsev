@@ -3,7 +3,6 @@ using namespace std;
 
 bool filewriting = false;
 FILE* fLog = fopen("test1", "a");
-string res[12][121];
 
 //¬—œŒÃŒ√¿“≈À‹Õ€≈ ‘”Õ ÷»»
 
@@ -253,11 +252,6 @@ int GetRandomNumber(int min, int max) {
 	return num;
 }
 
-void ResAdd(int Time, int len, int x, int y) {
-	res[0][x] = len;
-	res[y + 2][x] = Time;
-}
-
 void OutputData(FILE*& fLog) {
 	fLog = fopen("test1", "r");
 	int Time;
@@ -321,42 +315,9 @@ void Sort(int index, int* ar, int len) {
 	}
 }
 
-void ResMake() {
-	for (int i = 0; i < 12; i++)
-		for (int j = 0; j < 121; j++) {
-			res[i][j] = '\0';
-		}
-	res[1][0] = "Inser";
-	res[2][0] = "Tim";
-	res[3][0] = "Bubbl";
-	res[4][0] = "ModQ";
-	res[5][0] = "Quick";
-	res[6][0] = "Selec";
-	res[7][0] = "Count";
-	res[8][0] = "Merge";
-	res[9][0] = "Shell";
-	res[10][0] = "Gnome";
-	res[11][0] = "Heap";
-}
-
-void ResToFile() {
-	for (int i = 0; i < 12; i++) {
-		for (int j = 0; j < 121; j++) {
-			fprintf(fLog, "%5s", res[i][j].c_str());
-		}
-		fprintf(fLog, "\n");
-	}
-}
-
-void Test() {
-	ResMake();
-	srand(static_cast<unsigned int>(time(NULL)));
-	int* ar = new int[10000000];
-	int* funcOut = new int[11];
-	for (int i = 0; i < 11; i++) {
-		funcOut[i] = 0;
-	}
-	for (int len = 100, step = 100, count = 1;; len += step, count++) {
+void ResPrep() {
+	fprintf(fLog, "%10c", '\0');
+	for (int step = 100, len = 100;; len += step) {
 		if (len == 1000) step = 250;
 		if (len == 5000) step = 500;
 		if (len == 10000) step = 1000;
@@ -365,8 +326,48 @@ void Test() {
 		if (len == 500000) step = 100000;
 		if (len == 3000000) step = 1000000;
 		if (len > 10000000) break;
+		fprintf(fLog, "%10d", len);
+	}
+	fprintf(fLog, "\n");
+}
 
-		for (int i = 0; i < 11; i++) {
+void ResAdd(int i) {
+	fprintf(fLog, "\n");
+	if (i == 0) fprintf(fLog, "%10s", "Insertion");
+	if (i == 1) fprintf(fLog, "%10s", "Tim");
+	if (i == 2) fprintf(fLog, "%10s", "Bubble");
+	if (i == 3) fprintf(fLog, "%10s", "ModifQuick");
+	if (i == 4) fprintf(fLog, "%10s", "Quick");
+	if (i == 5) fprintf(fLog, "%10s", "Selection");
+	if (i == 6) fprintf(fLog, "%10s", "Counting");
+	if (i == 7) fprintf(fLog, "%10s", "Merge");
+	if (i == 8) fprintf(fLog, "%10s", "Shell");
+	if (i == 9) fprintf(fLog, "%10s", "Gnome");
+	if (i == 10) fprintf(fLog, "%10s", "Heap");
+}
+
+void Test() {
+	ResPrep();
+	srand(static_cast<unsigned int>(time(NULL)));
+	int* ar = new int[10000000];
+	int* funcOut = new int[11];
+	for (int i = 0; i < 11; i++) {
+		funcOut[i] = 0;
+	}
+
+	for (int i = 0; i < 11; i++) {
+		ResAdd(i);
+		int len = 100;
+		for (int step = 100, count = 1;; len += step, count++) {
+			if (len == 1000) step = 250;
+			if (len == 5000) step = 500;
+			if (len == 10000) step = 1000;
+			if (len == 40000) step = 10000;
+			if (len == 20000) step = 50000;
+			if (len == 500000) step = 100000;
+			if (len == 3000000) step = 1000000;
+			if (len > 10000000) break;
+
 			for (int j = 0; funcOut[i] == 0 && j < 6; j++) {
 				int times[6];
 				MashUp(ar, len);
@@ -384,12 +385,11 @@ void Test() {
 				if (j == 5) {
 					BubbleSort(times, 6);
 					Time = (times[2] + times[3]) / 2;
-					ResAdd(Time, len, count, i);
+					fprintf(fLog, "%10d", Time);
 				}
 			}
 		}
 	}
-	ResToFile();
 	delete[] ar;
 	fclose(fLog);
 }
