@@ -28,11 +28,7 @@ void GnomeSort(int* ar, int len);
 void HeapSort(int* ar, int len);
 
 int GetRandomNumber(int min, int max);
-void ResAdd(int Time, int len, int x, int y);
-void OutputData(FILE*& fLog);
 void MashUp(int* ar, int len);
-void Check(int* ar, int len);
 void Sort(int index, int* ar, int len);
-void ResMake();
-void ResToFile();
+void ResPrep();
 void Test();

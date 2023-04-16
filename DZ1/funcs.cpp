@@ -1,9 +1,7 @@
 #include "funcs.h"
 using namespace std;
 
-bool filewriting = false;
 FILE* fLog = fopen("test1", "a");
-string res[12][121];
 
 //¬—œŒÃŒ√¿“≈À‹Õ€≈ ‘”Õ ÷»»
 
@@ -253,34 +251,9 @@ int GetRandomNumber(int min, int max) {
 	return num;
 }
 
-void ResAdd(int Time, int len, int x, int y) {
-	res[0][x] = len;
-	res[y + 2][x] = Time;
-}
-
-void OutputData(FILE*& fLog) {
-	fLog = fopen("test1", "r");
-	int Time;
-	int len;
-	while (fscanf(fLog, "%d\t%d\n", &Time, &len) != EOF)
-		cout << Time << "\t" << len << "\t" << endl;
-	fclose(fLog);
-}
-
 void MashUp(int* ar, int len) {
 	for (int i = 0; i < len; i++)
 		ar[i] = GetRandomNumber(-1000, 1000);
-}
-
-void Check(int* ar, int len) {
-	bool ok = true;
-	for (int i = 0; i < len - 1; i++)
-		if (ar[i] > ar[i + 1])
-			ok = false;
-	if (ok)
-		cout << "SORTED CORRECTLY!" << endl;
-	else
-		cout << "SORT FAILED" << endl;
 }
 
 void Sort(int index, int* ar, int len) {
@@ -321,35 +294,23 @@ void Sort(int index, int* ar, int len) {
 	}
 }
 
-void ResMake() {
-	for (int i = 0; i < 12; i++)
-		for (int j = 0; j < 121; j++) {
-			res[i][j] = '\0';
-		}
-	res[1][0] = "Inser";
-	res[2][0] = "Tim";
-	res[3][0] = "Bubbl";
-	res[4][0] = "ModQ";
-	res[5][0] = "Quick";
-	res[6][0] = "Selec";
-	res[7][0] = "Count";
-	res[8][0] = "Merge";
-	res[9][0] = "Shell";
-	res[10][0] = "Gnome";
-	res[11][0] = "Heap";
-}
-
-void ResToFile() {
-	for (int i = 0; i < 12; i++) {
-		for (int j = 0; j < 121; j++) {
-			fprintf(fLog, "%5s", res[i][j].c_str());
-		}
-		fprintf(fLog, "\n");
-	}
+void ResPrep() {
+	fprintf(fLog, "%10s", "\0");
+	fprintf(fLog, "%10s", "Insertion");
+	fprintf(fLog, "%10s", "Tim");
+	fprintf(fLog, "%10s", "Bubble");
+	fprintf(fLog, "%10s", "ModQuick");
+	fprintf(fLog, "%10s", "Quick");
+	fprintf(fLog, "%10s", "Selection");
+	fprintf(fLog, "%10s", "Counting");
+	fprintf(fLog, "%10s", "Merge");
+	fprintf(fLog, "%10s", "Shell");
+	fprintf(fLog, "%10s", "Gnome");
+	fprintf(fLog, "%10s", "Heap");
 }
 
 void Test() {
-	ResMake();
+	ResPrep();
 	srand(static_cast<unsigned int>(time(NULL)));
 	int* ar = new int[10000000];
 	int* funcOut = new int[11];
@@ -361,10 +322,13 @@ void Test() {
 		if (len == 5000) step = 500;
 		if (len == 10000) step = 1000;
 		if (len == 40000) step = 10000;
-		if (len == 20000) step = 50000;
+		if (len == 200000) step = 50000;
 		if (len == 500000) step = 100000;
 		if (len == 3000000) step = 1000000;
 		if (len > 10000000) break;
+
+		fprintf(fLog, "\n");
+		fprintf(fLog, "%10d", len);
 
 		for (int i = 0; i < 11; i++) {
 			for (int j = 0; funcOut[i] == 0 && j < 6; j++) {
@@ -376,7 +340,7 @@ void Test() {
 				//Check(ar, len);
 				auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
 				int Time = elapsed_ms.count();
-				if (Time > 200) {
+				if (Time > 100) {
 					funcOut[i] = 1;
 					break;
 				}
@@ -384,12 +348,14 @@ void Test() {
 				if (j == 5) {
 					BubbleSort(times, 6);
 					Time = (times[2] + times[3]) / 2;
-					ResAdd(Time, len, count, i);
+					fprintf(fLog, "%10d", Time);
 				}
+			}
+			if (funcOut[i] == 1) {
+				fprintf(fLog, "%10s", "STOPPED");
 			}
 		}
 	}
-	ResToFile();
 	delete[] ar;
 	fclose(fLog);
 }
