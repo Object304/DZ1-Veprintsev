@@ -1,7 +1,7 @@
 #include "funcs.h"
 using namespace std;
 
-FILE* fLog = fopen("test1", "a");
+FILE* fLog = fopen("test1.txt", "a");
 
 //¬—œŒÃŒ√¿“≈À‹Õ€≈ ‘”Õ ÷»»
 
@@ -295,6 +295,7 @@ void Sort(int index, int* ar, int len) {
 }
 
 void ResPrep() {
+	cout << "Progress:" << endl;
 	fprintf(fLog, "%10s", "\0");
 	fprintf(fLog, "%10s", "Insertion");
 	fprintf(fLog, "%10s", "Tim");
@@ -318,26 +319,47 @@ void Test() {
 		funcOut[i] = 0;
 	}
 	for (int len = 100, step = 100, count = 1;; len += step, count++) {
-		if (len == 1000) step = 250;
-		if (len == 5000) step = 500;
-		if (len == 10000) step = 1000;
-		if (len == 40000) step = 10000;
-		if (len == 200000) step = 50000;
-		if (len == 500000) step = 100000;
-		if (len == 3000000) step = 1000000;
-		if (len > 10000000) break;
-
+		if (len == 1000) {
+			step = 250;
+			cout << "0%" << endl;
+		}
+		if (len == 5000) {
+			step = 500;
+		}
+		if (len == 10000) {
+			step = 1000;
+			cout << "10%" << endl;
+		}
+		if (len == 40000) {
+			step = 10000;
+			cout << "15%" << endl;
+		}
+		if (len == 200000) {
+			step = 50000;
+			cout << "30%" << endl;
+		}
+		if (len == 500000) {
+			step = 100000;
+			cout << "50%" << endl;
+		}
+		if (len == 3000000) {
+			step = 1000000;
+			cout << "70%" << endl;
+		}
+		if (len > 10000000) {
+			cout << "100%" << endl;
+			break;
+		}
 		fprintf(fLog, "\n");
 		fprintf(fLog, "%10d", len);
 
 		for (int i = 0; i < 11; i++) {
-			for (int j = 0; funcOut[i] == 0 && j < 6; j++) {
-				int times[6];
+			for (int j = 0; funcOut[i] == 0 && j < 21; j++) {
+				int times[21];
 				MashUp(ar, len);
 				auto begin = std::chrono::steady_clock::now();
 				Sort(i, ar, len);
 				auto end = std::chrono::steady_clock::now();
-				//Check(ar, len);
 				auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
 				int Time = elapsed_ms.count();
 				if (Time > 2000) {
@@ -345,9 +367,9 @@ void Test() {
 					break;
 				}
 				times[j] = Time;
-				if (j == 5) {
-					BubbleSort(times, 6);
-					Time = (times[2] + times[3]) / 2;
+				if (j == 20) {
+					BubbleSort(times, 21);
+					Time = (times[7] + times[8] + times[9] + times[10] + times[11] + times[12] + times[13]) / 7;
 					fprintf(fLog, "%10d", Time);
 				}
 			}
