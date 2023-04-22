@@ -2,8 +2,35 @@
 using namespace std;
 
 FILE* fLog = fopen("test1.txt", "a");
+void (*funcAr[11])(int*, int) = {
+	insertionSort, 
+	TimSort, 
+	BubbleSort, 
+	modifiedQuicksort, 
+	quickSort, 
+	SelectionSort, 
+	CountingSort, 
+	mergeSort, 
+	ShellSort, 
+	GnomeSort, 
+	HeapSort };
 
 //¬—œŒÃŒ√¿“≈À‹Õ€≈ ‘”Õ ÷»»
+
+void insertionSort(int* ar, int len) {
+	InsertionSort(ar, 0, len - 1);
+}
+
+void modifiedQuicksort(int* ar, int len) {
+	ModifiedQuicksort(ar, 0, len - 1);
+}
+void quickSort(int* ar, int len) {
+	QuickSort(ar, len - 1, 0);
+}
+
+void mergeSort(int* ar, int len) {
+	MergeSort(ar, len - 1, 0);
+}
 
 void Heapify(int* ar, int n, int i) {
 	int largest = i;
@@ -257,41 +284,7 @@ void MashUp(int* ar, int len) {
 }
 
 void Sort(int index, int* ar, int len) {
-	switch (index) {
-	case 0:
-		InsertionSort(ar, 0, len - 1);
-		break;
-	case 1:
-		TimSort(ar, len + 1);
-		break;
-	case 2:
-		BubbleSort(ar, len);
-		break;
-	case 3:
-		ModifiedQuicksort(ar, 0, len - 1);
-		break;
-	case 4:
-		QuickSort(ar, len - 1, 0);
-		break;
-	case 5:
-		SelectionSort(ar, len);
-		break;
-	case 6:
-		CountingSort(ar, len);
-		break;
-	case 7:
-		MergeSort(ar, len - 1, 0);
-		break;
-	case 8:
-		ShellSort(ar, len);
-		break;
-	case 9:
-		GnomeSort(ar, len);
-		break;
-	case 10:
-		HeapSort(ar, len);
-		break;
-	}
+	funcAr[index](ar, len);
 }
 
 void ResPrep() {

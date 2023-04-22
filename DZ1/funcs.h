@@ -27,6 +27,11 @@ void ShellSort(int* ar, int len);
 void GnomeSort(int* ar, int len);
 void HeapSort(int* ar, int len);
 
+void insertionSort(int* ar, int len);
+void modifiedQuicksort(int* ar, int len);
+void quickSort(int* ar, int len);
+void mergeSort(int* ar, int len);
+
 int GetRandomNumber(int min, int max);
 void MashUp(int* ar, int len);
 void Sort(int index, int* ar, int len);
