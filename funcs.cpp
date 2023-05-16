@@ -371,6 +371,7 @@ void Test() {
 			}
 		}
 	}
+	delete[] funcOut;
 	delete[] ar;
 	fclose(fLog);
 }
